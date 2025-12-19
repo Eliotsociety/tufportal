@@ -1,0 +1,566 @@
+
+    var urlparts=window.location.pathname.split( '/' );
+    // var base_url = window.location.origin+"/"+urlparts[1]+"/"+urlparts[2];
+    var base_url = window.location.origin;
+
+    //$(".knob").knob();
+    $('#glossary').DataTable();
+    $('#course-assignment').DataTable();
+    var groupColumn = 2;
+    var table = $('#course-lesson').DataTable({
+        "columnDefs": [
+            {"visible": false, "targets": groupColumn}
+        ],
+        "order": [[groupColumn, 'asc']],
+        "displayLength": 25,
+        "drawCallback": function (settings) {
+            var api = this.api();
+            var rows = api.rows({page: 'current'}).nodes();
+            var last = null;
+
+            api.column(groupColumn, {page: 'current'}).data().each(function (group, i) {
+                if (last !== group) {
+                    $(rows).eq(i).before(
+                        '<tr class="group bg-behance" ><td colspan="8" class="text-white">Week No :' + group + '</td></tr>'
+                    );
+
+                    last = group;
+                }
+            });
+        }
+    });
+
+    if ($('#gpa-semster').length) {
+        var semster = document.getElementById("gpa-semster").getContext('2d');
+        var gpaSemster = new Chart(semster, {
+            type: 'bar',
+            data: {
+                labels: [
+
+                ],
+                datasets: [{
+                    label: 'GPA',
+                    data: [
+
+                    ],
+                    // backgroundColor: "#dc3912"
+                }]
+            },
+            options: {
+                plugins: {
+
+                    colorschemes: {
+
+                        scheme: 'brewer.Accent3'
+
+                    }
+
+                },
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#585757',
+                        boxWidth:40
+                    }
+                },
+                tooltips: {
+                    enabled:true
+                },
+                scales: {
+                    xAxes: [{
+                        barPercentage: .1,
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Semsters"
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            suggestedMin:0,
+                            suggestedMax:4,
+                            stepSize:1,
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "GPA"
+                        }
+                    }]
+                }
+            }
+        });
+        var semsterLine = document.getElementById("gpa-semster-line").getContext('2d');
+        //var ctx = document.getElementById('lineChart').getContext('2d');
+        var semsterLineChart = new Chart(semsterLine, {
+            type: 'line',
+            data: {
+                labels: [
+
+                ],
+                datasets: [{
+                    label: 'GPA',
+                    data: [
+
+                    ],
+                    backgroundColor: "transparent",
+                    // borderColor: "#14abef",
+                    pointRadius :"0",
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: {
+
+                    colorschemes: {
+
+                        scheme: 'brewer.Paired10'
+
+                    }
+
+                },
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#585757',
+                        boxWidth:40
+                    }
+                },
+                tooltips: {
+                    enabled:false
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Semsters"
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            suggestedMin:0,
+                            suggestedMax:4,
+                            stepSize:1,
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "GPA"
+                        }
+                    }]
+                }
+            }
+        });
+        labels=[];
+        gpas=[]
+        $.get(base_url+"/student/SemesterGpas",
+            function (response){
+                console.log(response);
+                gpaSemster.data.labels=response.labels;
+                gpaSemster.data.datasets[0].data=response.data;
+                gpaSemster.update();
+                //lineChart
+                semsterLineChart.data.labels=response.labels;
+                semsterLineChart.data.datasets[0].data=response.data;
+                semsterLineChart.update();
+
+            }
+        ).error(function (e){
+            console.log(11, e);
+        });
+    }
+    if($('#subjectsAttendance').length){
+        //var progress = document.getElementById('animationProgress');
+        var subjectsAttendance = document.getElementById("subjectsAttendance").getContext('2d');
+        var subjectsAttendanceChart = new Chart(subjectsAttendance, {
+            type: 'bar',
+            data: {
+                labels: [
+
+                ],
+                datasets: [{
+                    label: 'Attendance Percentage',
+                    data: [
+
+                    ],
+                    // backgroundColor: "#dc3912"
+                }]
+            },
+            options: {
+                plugins: {
+
+                    colorschemes: {
+
+                        scheme: 'brewer.Paired12'
+
+                    }
+
+                },
+
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#585757',
+                        boxWidth:40
+                    }
+                },
+                tooltips: {
+                    enabled:true
+                },
+                scales: {
+                    xAxes: [{
+                        barPercentage: .2,
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757',
+                            display: false
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Subjects"
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Attendance Percentage"
+                        }
+                    }]
+                }
+            }
+        });
+        $.ajax({
+            type:'get',
+            url:base_url+"/student/latestSemesterSubjectsAttendance",
+            dataType: 'json',
+            timeout: 10000,
+            cache: false
+        }).done(function (response){
+            subjectsAttendanceChart.data.labels=response.subjects;
+            subjectsAttendanceChart.data.datasets[0].data=response.perc;
+            subjectsAttendanceChart.update();
+        }).fail(function (err,status,errstr){
+            console.log(err.statusText,err.status ,status,errstr)
+        });
+        // $.getJSON(base_url+"/student/latestSemesterSubjectsAttendance",
+        //     function (response){
+        //         //barchart
+        //         //console.log(response);
+        //         subjectsAttendanceChart.data.labels=response.subjects;
+        //         subjectsAttendanceChart.data.datasets[0].data=response.perc;
+        //         subjectsAttendanceChart.update();
+        //
+        //
+        //     }
+        // ).error(function (xhr, status, error){
+        //     console.log(xhr.status, status,error);
+        // }).always(function (){
+        //     console.log('waiting....')
+        // });
+    }
+
+
+    $('.assigmentAttachment').click(function (){
+        var assignment=$(this).attr('assigment-id');
+        console.log(assignment);
+        console.log('acb');
+        $('#assignmentID').val(assignment);
+    });
+    $('#dairyEdit').click(function (){
+        var dairyId=$(this).attr('daryID');
+        $.ajax({
+            type:'get',
+            url:base_url+'/student/getDairy/'+dairyId,
+            dataType: 'json',
+            data:{
+                _token: '{{ csrf_token() }}'
+            },
+            success:function(data) {
+                $('#dairy').val(data.id);
+                $('#note').val(data.notes)
+                $('#personalDairy').attr('action','personal-dairy/update')
+                $('#personalDairy').attr('method','PATCH')
+                //console.log(data.id);
+                $("#formemodal").modal();
+            },
+            fail:function (err){
+                console.log(err);
+            }
+        });
+    });
+
+    if($('#selectedSemesterAttendance').length){
+        var selectSubjectsAttendance = document.getElementById("selectedSemesterAttendance").getContext('2d');
+        var selectSubjectsAttendanceChart = new Chart(selectSubjectsAttendance, {
+            type: 'bar',
+            data: {
+                labels: [
+
+                ],
+                datasets: [{
+                    label: 'Attendance Percentage',
+                    data: [
+
+                    ],
+                    // backgroundColor: "#dc3912"
+                }]
+            },
+            options: {
+                plugins: {
+
+                    colorschemes: {
+
+                        scheme: 'brewer.RdYlGn11'
+
+                    }
+
+                },
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#585757',
+                        boxWidth:40
+                    }
+                },
+                tooltips: {
+                    enabled:true
+                },
+                scales: {
+                    xAxes: [{
+                        barPercentage: .2,
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757',
+                            display: false
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Subjects"
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Attendance Percentage"
+                        }
+                    }]
+                }
+            }
+        });
+    }
+    $('#selectedSemesterAttendance').hide();
+    $('#selectSemester').change(function (){
+        var semId=$(this).val();
+        var semNo=$("#selectSemester option:selected").text();
+        subjects=[];
+        perc=[];
+        //console.log(semId,semNo)
+        $.ajax({
+            type:'get',
+            url:base_url+'/student/selectedSemesterAttendance',
+            data:{'semesterID':semId,'semesterNo':semNo},
+            success:function (data){
+                console.log(data);
+
+                data.forEach(function (index,value){
+                   // console.log(index,value);
+                    if(index.LECTURE_TYPE='T'){
+                        subjects.push(index.SUBJECT_NAME);
+                        perc.push(index.PERC);
+                    }
+                });
+                selectSubjectsAttendanceChart.data.labels=subjects;
+                selectSubjectsAttendanceChart.data.datasets[0].data=perc;
+                selectSubjectsAttendanceChart.update();
+                $('#selectedSemesterAttendance').show();
+                //console.log(subjects,perc)
+            },
+            error:function (err){
+                console.log(err);
+            }
+        });
+
+    });
+
+
+    if ($('#feeCollective').length) {
+        var feeCollective = document.getElementById("feeCollective").getContext('2d');
+        var feeCollectiveChart = new Chart(feeCollective, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Total Receivables',
+                    data: [],
+                    backgroundColor: "#3366cc"
+                }, {
+                    label: 'Total Received',
+                    data: [],
+                    backgroundColor: "#dc3912"
+                }]
+            },
+            options: {
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#585757',
+                        boxWidth:40
+                    }
+                },
+                tooltips: {
+                    enabled:true
+                },
+                scales: {
+                    xAxes: [{
+                        barPercentage: .2,
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            fontColor: '#585757'
+                        },
+                        gridLines: {
+                            display: true ,
+                            color: "rgba(0, 0, 0, 0.07)"
+                        },
+                    }]
+                }
+
+            }
+        });
+
+
+        $.get(base_url+'/student/studentCollectiveFinancials',
+            function (response){
+
+                feeCollectiveChart.data.labels=response.semesters;
+                feeCollectiveChart.data.datasets[0].data=response.recable;
+                feeCollectiveChart.data.datasets[1].data=response.recd;
+                feeCollectiveChart.update();
+
+            }
+        ).
+        error(function (err)
+            {
+                console.log(err);
+            }
+        );
+    }
+
+
+    if ($('#financialDistribution').length) {
+        var financialDistribution = document.getElementById("financialDistribution").getContext('2d');
+        var financialDistributionChart = new Chart(financialDistribution, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    // backgroundColor: [
+                    //     "#eb5076",
+                    //     "#fba540",
+                    //     "#000000",
+                    //     "#03d0ea"
+                    // ],
+                    data: [],
+                    //borderWidth: [0, 0, 0, 0]
+                }]
+            },
+            options: {
+                plugins: {
+
+                    colorschemes: {
+
+                        scheme: 'brewer.Accent7'
+
+                    }
+
+                },
+                legend: {
+                    position :"right",
+                    display: true,
+                    labels: {
+                        fontColor: '#585757',
+                        boxWidth:15
+                    }
+                }
+            }
+        });
+
+        $.get(base_url+'/student/getFinancialDistribution',
+            function (response){
+
+                financialDistributionChart.data.labels=response.fh_name;
+                financialDistributionChart.data.datasets[0].data=response.amount;
+
+                financialDistributionChart.update();
+
+            }
+        ).
+        error(function (err)
+            {
+                console.log(err);
+            }
+        );
+    }
+
+
+
+
+
